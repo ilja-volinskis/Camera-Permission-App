@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CameraPermissionApp</string>
+    <string name="please_grant_the_camera_permission">Please grant the camera permission</string>
+    <string name="camera">Camera</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="capture_photo">Capture photo</string>
 </resources>
