@@ -1,6 +1,6 @@
 package com.example.camerapermissionapp.ui.camera
 
-import android.graphics.Bitmap
+import android.content.Context
 import android.graphics.Color
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
@@ -21,16 +21,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.camerapermissionapp.R
 
 @Composable
-fun CameraScreen() {
-    CameraContent(onPhotoCaptured = { })
+fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
+    CameraContent(
+        capturePhotoAndStoreInGallery = viewModel::capturePhotoAndStoreInGallery,
+    )
 }
 
 @Composable
 fun CameraContent(
-    onPhotoCaptured: (Bitmap) -> Unit,
+    capturePhotoAndStoreInGallery: (Context, LifecycleCameraController) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -40,7 +43,9 @@ fun CameraContent(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {  },
+                onClick = {
+                    capturePhotoAndStoreInGallery(context, cameraController)
+                },
                 modifier = Modifier
             ) {
                 Icon(

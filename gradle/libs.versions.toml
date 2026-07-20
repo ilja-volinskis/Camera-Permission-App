@@ -11,8 +11,10 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 accompanistVersion = "0.37.3"
 material3Version = "1.4.0"
+lifecycleViewmodelCompose = "2.11.0"
 
 [libraries]
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistVersion" }
