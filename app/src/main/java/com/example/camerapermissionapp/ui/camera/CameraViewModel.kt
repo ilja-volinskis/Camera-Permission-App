@@ -2,50 +2,48 @@ package com.example.camerapermissionapp.ui.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.camerapermissionapp.data.PhotoRepository
 import com.example.camerapermissionapp.data.capturePhoto
 import com.example.camerapermissionapp.data.savePhotoToGallery
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CameraViewModel(
-
+@HiltViewModel
+class CameraViewModel @Inject constructor(
+    private val photoRepository: PhotoRepository
 ): ViewModel() {
 
-    private val _state = MutableStateFlow(CameraState())
-    val state = _state.asStateFlow()
+    private val _uiState = MutableStateFlow<CameraUiState>(CameraUiState.Idle)
+    val uiState = _uiState.asStateFlow()
 
-    fun capturePhotoAndStoreInGallery(
-        context: Context,
-        cameraController: LifecycleCameraController
-    ) {
-        capturePhoto(
-            context,
-            cameraController,
-            onPhotoCaptured = {
-                _state.value = _state.value.copy(lastImage = it)
-                storePhotoInGallery(context, it)
-            }
-        )
+    fun capturePhoto(cameraController: LifecycleCameraController) {
+        if (_uiState.value == CameraUiState.Capturing) return
+
+        _uiState.value = CameraUiState.Capturing
+        viewModelScope.launch {
+            photoRepository.capturePhoto(cameraController)
+                .onSuccess { uri -> _uiState.value = CameraUiState.Success(uri) }
+                .onFailure { e -> _uiState.value = CameraUiState.Error(e.message ?: "Capture failed") }
+        }
     }
 
-    fun storePhotoInGallery(
-        context: Context,
-        photo: Bitmap
-    ) {
-        viewModelScope.launch {
-            savePhotoToGallery(context, photo)
-                .onSuccess { uri -> Log.i("PHOTO", "Photo saved successfully at ${uri.path}") }
-                .onFailure { e -> Log.e("PHOTO", e.message.orEmpty()) }
-            photo.recycle()
-        }
+    fun consumeResult() {
+        _uiState.value = CameraUiState.Idle
     }
 }
 
-data class CameraState(
-    val lastImage: Bitmap? = null
-)
+sealed interface CameraUiState {
+    data object Idle: CameraUiState
+    data object Capturing: CameraUiState
+    data class Success(val uri: Uri): CameraUiState
+    data class Error(val message: String): CameraUiState
+}
+

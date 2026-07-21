@@ -4,4 +4,5 @@
     <string name="camera">Camera</string>
     <string name="grant_permission">Grant permission</string>
     <string name="capture_photo">Capture photo</string>
+    <string name="photo_saved">Photo saved</string>
 </resources>
