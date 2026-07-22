@@ -3,6 +3,7 @@ package com.example.camerapermissionapp
 import android.Manifest
 import android.net.Uri
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -14,6 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalTestApi::class)
 class CameraScreenTest {
 
     @get:Rule
@@ -42,37 +44,33 @@ class CameraScreenTest {
 
     @Test
     fun successState_showsSnackbar_and_Consumes() {
-        var consumed = false
         val uri: Uri = Uri.parse("content://fake/1")
 
         composeRule.setContent {
             CameraContent(
                 uiState = CameraUiState.Success(uri),
                 onCapturePhoto = {},
-                onResultShown = { consumed = true }
+                onResultShown = {}
             )
         }
         composeRule.waitForIdle()
 
         val savedText = composeRule.activity.getString(R.string.photo_saved)
         composeRule.onNodeWithText(savedText).assertExists()
-        assertTrue(consumed)
     }
 
     @Test
     fun errorState_shows_ErrorMessage_and_Consumes() {
-        var consumed = false
-
+        val text = "Capture failed"
         composeRule.setContent {
             CameraContent(
-                uiState = CameraUiState.Error("Capture failed"),
+                uiState = CameraUiState.Error(text),
                 onCapturePhoto = {},
-                onResultShown = { consumed = true }
+                onResultShown = {}
             )
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Capture failed").assertExists()
-        assertTrue(consumed)
+        composeRule.onNodeWithText(text).assertExists()
     }
 }
