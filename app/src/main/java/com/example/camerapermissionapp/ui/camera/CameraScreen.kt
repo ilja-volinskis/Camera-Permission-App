@@ -60,12 +60,12 @@ fun CameraContent(
     LaunchedEffect(uiState) {
         when (uiState) {
             is CameraUiState.Success -> {
-                snackbarHostState.showSnackbar(savedMessage)
                 onResultShown()
+                snackbarHostState.showSnackbar(savedMessage)
             }
             is CameraUiState.Error -> {
-                snackbarHostState.showSnackbar(uiState.message)
                 onResultShown()
+                snackbarHostState.showSnackbar(uiState.message)
             }
             else -> Unit
         }
